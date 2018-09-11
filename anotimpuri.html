@@ -1,0 +1,178 @@
+﻿
+<!doctype html>
+<html lang="en">
+<head>
+
+<title>Niveau saisons</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width" />
+<link rel="stylesheet" type="text/css" href="css/anotimpuri.css">
+<link rel="stylesheet" href="css/stylesheet.css" type="text/css">
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+<script src="js/jquery.ui.touch-punch.min.js"></script>
+
+<!-- legatura algoritm criptare -->
+<script type="text/javascript" src="js/algoritm_criptare.js" charset="utf-8"></script>
+
+<script type="text/javascript">
+
+var v="AaAaÂâEeÉéEeEeËëIiÎîIiOoÔôUuUuUuÜüLl-',.;:?1234567890";
+var words = ['printemps', 'hiver', 'été', 'automne'];
+
+  // Initializare
+  
+function intial() {
+	//document.getElementById('container_back').style.background = 'rgba(22, 160, 133,0.8)'; 
+		
+	for ( var i=1; i<=4; i++ ) {
+		document.getElementById(i).innerHTML = prop(words[i-1]);
+		document.getElementById(i).style.color = 'white';
+    }
+}
+  
+  // Ajutor
+ 
+function ajutor() {
+	//document.getElementById('wrapper').style.background = 'rgb(80,80,80)';
+
+	for ( var i=1; i<=4; i++ ) {
+		document.getElementById(i).innerHTML = words[i-1];
+		document.getElementById(i).style.color = 'tomato';
+    };
+}
+ 
+var correctCards = 0;
+$( init );
+var startTime = new Date();
+
+function init() {
+
+   
+  // Mesaj final ascuns
+	$('#successMessage').hide();
+	$('#successMessage').css( {
+		left: '580px',
+		top: '250px',
+		width: 0,
+		height: 0
+	});
+
+  // Reset
+	startTime = Date.now();
+	correctCards = 0;
+	$('#cardPile').html( '' );
+	$('#cardSlots').html( '' );
+
+  // Creare obj
+	var numbers = [ 1, 2, 3, 4];
+	numbers.sort( function() { return Math.random() - .5 } );
+
+	for ( var i=0; i<4; i++ ) {
+		$('<div><img src="img/anotimp/' + numbers[i] + '.jpg"></div>').data( 'number', numbers[i] ).attr( 'id', 'card'+numbers[i] ).appendTo( '#cardPile' ).draggable( {
+			containment: '#content',
+			stack: '#cardPile div',
+			cursor: 'move',
+			revert: true
+		} );
+	}
+
+  // Creaza raspunsurile
+	for ( var i=1; i<=4; i++ ) {
+		$('<div id="'+ i +'">' + prop(words[i-1]) + '</div>').data( 'number', i ).appendTo( '#cardSlots' ).droppable( {
+			accept: '#cardPile div',
+			hoverClass: 'hovered',
+			drop: handleCardDrop
+		} );
+	}
+}
+
+function handleCardDrop( event, ui ) {
+	var slotNumber = $(this).data( 'number' );
+	var cardNumber = ui.draggable.data( 'number' );
+
+  // daca correct,
+  // schimba culoarea, position:directly
+  // not draggable
+
+	if ( slotNumber == cardNumber ) {
+		ui.draggable.addClass( 'correct' );
+		ui.draggable.draggable( 'disable' );
+		$(this).droppable( 'disable' );
+		ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
+		ui.draggable.draggable( 'option', 'revert', false );
+		correctCards++;
+	} 
+  
+  // Daca toate sunt corect pozitionate => mesaj + timer
+  // reset
+
+	if ( correctCards == 4 ) {
+		$('#successMessage').show();
+		$('#successMessage').animate( {
+			left: '0px',
+			top: '0px',
+			width: '100%',
+			height: '100%',
+			opacity: 1
+		} );
+		var finTime = new Date();
+		var seconds = parseInt((finTime-startTime)/1000);
+		document.getElementById('timp').innerHTML = seconds;
+	}
+}
+ /*
+$(document).ready(function(){
+	setTimeout(function(){
+		$('#tutMessage').show();
+		$('#tutMessage').animate( {
+			left: '0px',
+			top: '0px',
+			width: '100%',
+			height: '100%',
+			opacity: .988
+		} );
+	},100);
+});
+
+function close_tut () {
+document.getElementById("tutMessage").style.left = "1560px";
+document.getElementById("tutMessage").style.opacity = "0";
+
+}
+*/
+</script>
+</head>
+
+<body id="wrapper">
+	<div id="lumina" style="display:none"></div>
+	
+	<button onclick="ajutor(); setTimeout(intial, 1800); a();" id="hint">Aide:<br><img src="img/light.png"></button>
+	
+	<div class="overBox">
+		<a href="index.html">Retour &#224; la page principale</a>
+	</div>
+	
+	<div class="wideBox">
+		<h1>D&#233;crypte les saisons!</h1>
+	</div>
+	
+	<div id="content">
+		<div id="cardPile"> </div>
+		<div id="container_back">
+			<div id="cardSlots"> </div>
+		</div>
+	</div>
+	
+	<div id="successMessage">
+		<h2>F&#233;licitations! Tu as fini en <p id="timp" style="font-size:4em; color:tomato; margin:40px;"></p> secondes!</h2>
+		<br><button id="button" onClick="history.go(0)">Joue encore une fois!</button>
+	</div>
+	<!--<div id="tutMessage">
+		<img src="img/tut-ferma.gif">
+		<button id="tutButton" onClick="close_tut()">Joaca!</button>
+	</div>-->
+</body>
+</html>
+

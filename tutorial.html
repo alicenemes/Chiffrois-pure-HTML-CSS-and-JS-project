@@ -1,0 +1,351 @@
+
+<!doctype html>
+<html>
+<head>
+
+<title>Tutoriel</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="css/tutorial.css">
+<link rel="stylesheet" href="css/stylesheet.css" type="text/css">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+<script src="js/jquery.ui.touch-punch.min.js"></script>
+
+<!-- legatura algoritm criptare -->
+<script type="text/javascript" src="js/algoritm_criptare.js"></script>
+
+
+<script type="text/javascript">
+  
+  // verifica daca prima litera e vocala
+
+function vocala(str)
+{
+	var h=true;
+	var v="AaAaÂâEeÉéEeEeËëIiÎîIiOoÔôUuUuUuÜüLl-',.;:?1234567890";
+	if (v.indexOf(str.charAt(0))==-1)
+	{
+		h=false;
+	}
+	return h;
+}
+
+// vocala aleatorie
+
+function ran_voc()
+{
+var ran = "";
+var voc = "aeiou";
+
+while (ran.length < 1) {
+  ran += voc[Math.floor(Math.random() * voc.length)];
+}
+return ran;
+}
+
+// cripteaza cuvantul
+
+function cript(str)
+{
+var str1 = str;
+var vr = ran_voc();
+var car="";
+if (".,?!;: ".indexOf(str.charAt(str.length-1))!=-1)
+{
+	car=str.charAt(str.length-1);
+	str=str.slice(0,-1);
+	car=' '.concat(car);
+} else {	car=""	}
+if (!vocala(str))
+{
+	if (str.charAt(0)==str.charAt(0).toLowerCase())
+	{
+		str=str.concat(str.charAt(0),vr);
+		str=str.slice(1);
+		str="l".concat(str);
+	}
+	else 
+	{
+		str=str.concat(str.charAt(0).toLowerCase(),vr);
+		str=str.slice(1);
+		str="L".concat(str);
+	}
+}
+else
+	{
+		str1=str;
+    	str="";
+    	while ((vocala(str1))&&(str1!=""))
+        {
+            str=str.concat(str1.charAt(0));
+            str1=str1.slice(1);
+        }
+        if (str1!="")
+		{
+			if (str1.charAt(0)==str1.charAt(0).toLowerCase())
+			{
+				str=str.concat("l");
+				str1=str1.concat(str1.charAt(0),vr);
+				str=str.concat(str1.slice(1));
+			}
+			else 
+			{
+				str=str.concat("L");
+				str1=str1.concat(str1.charAt(0).toLowerCase(),vr);
+				str=str.concat(str1.slice(1));
+			}
+		}
+    }
+	//str=str.concat(car);
+	return str;
+}
+
+// propozitii 
+
+function prop(str)
+{
+	var str1=""; str2=""; i=0;
+if (str.indexOf(' ')==-1)
+{
+	str2=cript(str);
+	str2=str2.concat(' ');
+}
+else
+{
+	str=str.concat(" ");
+	for (i=0; i<str.length; i++)
+	{
+		if (str.charAt(i)!=" ")
+		{
+			str1=str1.concat(str.charAt(i));
+		}
+		else
+		{
+			str1=cript(str1);
+			str2=str2.concat(str1,' ');
+			str1="";
+		}
+	}
+}
+	return str2;
+}
+  
+  // Initializare
+  
+function intial() {
+    $('#wrapper').animate({backgroundColor: 'rgb(244,212,199)'}, 'slow');
+	//document.getElementById('wrapper').style.background = 'rgb(244,212,199)'; 
+	x = document.getElementById('lumina');
+
+	if (x.style.display === 'block') {
+	    x.style.display = 'none';
+    }
+	var words = [ 'poulet', 'oie', 'vache', 'cochon', 'lapin', 'cheval', 'chien' ];
+	for ( var i=1; i<=7; i++ ) {
+		document.getElementById(i).innerHTML = prop(words[i-1]);
+		document.getElementById(i).style.color = 'rgba(104,72,59,0.8)';
+    }
+}
+  
+  // Hint
+  // Change words to before
+ 
+function ajutor() {
+    $('#wrapper').animate({backgroundColor: 'rgb(80,80,80)'}, 'fast');
+	//document.getElementById('wrapper').style.background = 'rgb(80,80,80)';
+	x = document.getElementById('lumina');
+		
+	var words = [ 'poulet', 'oie', 'vache', 'cochon', 'lapin', 'cheval', 'chien' ];
+	for ( var i=1; i<=7; i++ ) {
+		document.getElementById(i).innerHTML = words[i-1];
+		document.getElementById(i).style.color = 'white';
+    };
+	
+    if (x.style.display === 'none') {
+	    x.style.display = 'block';
+    }
+}
+ 
+
+var correctCards = 0;
+$( init );
+var startTime = new Date();
+
+
+function init() {
+
+   
+  // Hide message
+	$('#successMessage').hide();
+	$('#successMessage').css( {
+		left: '580px',
+		top: '250px',
+		width: 0,
+		height: 0
+	});
+
+  // Reset
+	startTime = Date.now();
+	correctCards = 0;
+	$('#cardPile').html( '' );
+	$('#cardSlots').html( '' );
+
+  // Create obj
+	var numbers = [ 1, 2, 3, 4];
+	numbers.sort( function() { return Math.random() - .5 } );
+
+	for ( var i=0; i<4; i++ ) {
+		$('<div><img src="img/tutorial/' + numbers[i] + '.png"></div>').data( 'number', numbers[i] ).attr( 'id', 'card'+numbers[i] ).appendTo( '#cardPile' ).draggable( {
+			containment: '#content',
+			stack: '#cardPile div',
+			cursor: 'move',
+			revert: true
+		} );
+	}
+
+  // Create the answers
+	var words = [ '', '', '', ''];
+	for ( var i=1; i<=4; i++ ) {
+		$('<div id="'+ i +'">' + words[i-1] + '</div>').data( 'number', i ).appendTo( '#cardSlots' ).droppable( {
+			accept: '#cardPile div',
+			hoverClass: 'hovered',
+			drop: handleCardDrop
+		} );
+	}
+}
+
+function handleCardDrop( event, ui ) {
+	var slotNumber = $(this).data( 'number' );
+	var cardNumber = ui.draggable.data( 'number' );
+
+  // If correct,
+  // change colour, position:directly
+  // not draggable
+
+	if ( slotNumber == cardNumber ) {
+		ui.draggable.addClass( 'correct' );
+		ui.draggable.draggable( 'disable' );
+		$(this).droppable( 'disable' );
+		ui.draggable.position( { of: $(this), my: 'left top', at: 'left top' } );
+		ui.draggable.draggable( 'option', 'revert', false );
+		correctCards++;
+	} 
+  
+  // If all correct => message + timer
+  // reset
+
+	if ( correctCards == 4 ) {
+		$('#successMessage').show();
+		$('#successMessage').animate( {
+			left: '0px',
+			top: '0px',
+			width: '100%',
+			height: '100%',
+			opacity: 1
+		} );
+		var finTime = new Date();
+		var seconds = parseInt((finTime-startTime)/1000);
+		document.getElementById('timp').innerHTML = seconds;
+		document.getElementById('hint').style.display = 'none';
+	}
+}
+
+function tut_cuv (){
+
+var cuvant = prompt("Écrit n`importe quel mot!");
+var cuvant_criptat = prompt("Maintenant crypte-le!");
+var cuvant = prop(cuvant).slice(0,-1);
+var cuvant=cuvant.split(" "); 
+var cuvant_criptat = cuvant_criptat.split(" ");
+	if (cuvant.length==cuvant_criptat.length)
+	{
+		var h = true;
+		var lung = cuvant.length;		
+		var i = 0;
+		for(i=0 ; i<lung ; i++)
+			{
+				var a = cuvant[i];
+				var b = cuvant_criptat[i];
+				if (".,?!;: ".indexOf(a.charAt(a.length-1))!=-1)
+					{
+						a = a.slice(0,-1);
+					}
+				if (".,?!;: ".indexOf(b.charAt(b.length-1))!=-1)
+					{
+						b = b.slice(0,-1);
+					}
+				if(a.slice(0,-1)!= b.slice(0,-1))
+					{
+							h = false;
+					}
+			}
+		if (h)
+		{alert("Félicitations! Tu as compris."); }
+		else
+		{alert("Essai encore une fois!");}
+	}
+	else 
+	{
+		alert("Essai encore une fois!");
+	}
+}
+
+/*
+$(document).ready(function(){
+	setTimeout(function(){
+		$('#tutMessage').show();
+		$('#tutMessage').animate( {
+			left: '0px',
+			top: '0px',
+			width: '100%',
+			height: '100%',
+			opacity: .988
+		} );
+	},100);
+})
+
+
+function close_tut () {
+document.getElementById("tutMessage").style.left = "1560px";
+document.getElementById("tutMessage").style.opacity = "0";
+
+}
+*/
+</script>
+</head>
+
+<body id="wrapper" >
+	<div id="lumina" style="display:none"></div>
+	
+	<!--<button onclick="ajutor(); setTimeout(intial, 1800); a();" id="hint">Ajutor:<br><img src="img/light.png"></button>-->
+	
+	<div class="overBox">
+		<a href="index.html">Retour &#224; la page principale</a>
+	</div>
+	
+	<div class="wideBox">
+		<h1>Essai à mettre les aimants sur le frigo pour former le mot "lhatci" décripté. <br>
+		Le chat au-dessous est l`indice. </h1>
+	</div>
+	<img src="img/tutorial/cat.png" style="" id="pisica"></img>
+	<div id="content" style="">
+		<div id="cardPile"> </div>
+		<div id="container_back">
+			<div id="cardSlots" style="border:0;"> </div>
+		</div>
+	</div>
+	
+	<div id="successMessage">
+		<h2>F&#233;licitations! Tu as fini en <p id="timp" style="font-size:3.4em; color:tomato; margin:40px;"></p> secundes! As-tu réussi à comprendre la méthode de cryptage?<br><br> <img src="img/reg_cript.gif" style="border-radius:10px; max-height: 118px; margin-top: 8px;"></h2>
+		<br><button id="button" onClick="tut_cuv()">Crypte n`importe quel mot.</button>
+		<button id="button" onClick="history.go(0)">Joue encore une fois!</button>
+	</div>
+	<!--<div id="tutMessage">
+		<img src="img/decript-tut.gif">
+		<button id="tutButton" onClick="close_tut()">Joaca!</button>
+	</div>-->
+</body>
+</html>
+
